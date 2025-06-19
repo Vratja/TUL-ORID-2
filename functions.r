@@ -11,34 +11,34 @@ cat_color <- function(txt, TF = TRUE) {
 
 check_answers_1 <- function() {
     if (!is.null(colnames(df)) && sum(colnames(df) %in% c("mpg", "cyl", "disp")) == 3) {
-      cat_color("Data byla spravne nactena.\n")
+      cat_color("Data byla správně načtena.\n")
     } else {
-      cat_color("Data nejsou ve spravnem formatu. Zkontrolujte promennou 'data'.", FALSE)
+      cat_color("Data nejsou ve správném formátu. Zkontrolujte proměnnou 'data'.", FALSE)
     }
 }
 
 check_answers_2 <- function() {
     TF <- !is.null(n_rows) && !is.null(max_hp) && !is.null(med_cyl)
-    if(!TF) return(cat_color("Hodnoty nebyly prirazeny do spravnych promennych.", FALSE))
+    if(!TF) return(cat_color("Hodnoty nebyly přiřazeny do správných proměnných.", FALSE))
     TF <- n_rows == nrow(df) && round(max_hp,0) == round(max(df$hp),0) && round(med_cyl,0) == round(median(df$cyl))
     if (TF) {
-        return(cat_color("Vse prirazeno spravne.\n")) 
-    } else return(cat_color("Nekde se stala chyba.", FALSE))
+        return(cat_color("Vše přiřazeno správně.\n")) 
+    } else return(cat_color("Někde se stala chyba.", FALSE))
 }
 
 check_answers_3 <- function() {
     TF <- max_mpg == max(df[df$cyl==6, "mpg"]) & ncol(df_fil_sel_2) == 3 & nrow(df_fil_sel_2) == 7 & nrow(df_fil_sel_3) == 4
-    if(TF) cat_color("Vsechny testy v poradku.") else cat_color("Nekde je chyba.", FALSE)
+    if(TF) cat_color("Všechny testy v pořádku.") else cat_color("Někde je chyba.", FALSE)
 }
 
 check_answers_4 <- function() {
-    if(is.null(cars_converted)) return(cat_color("Nebyl spravne vytvoren dataset: cars_converted"), FALSE)
-    if(!"stop_time_round" %in% names(cars_converted)) return(cat_color("Data neobsahuji sloupec: stop_time_round."), FALSE)
+    if(is.null(cars_converted)) return(cat_color("Nebyl správně vytvořen dataset: cars_converted"), FALSE)
+    if(!"stop_time_round" %in% names(cars_converted)) return(cat_color("Data neobsahují sloupec: stop_time_round."), FALSE)
     
     x <- cars_converted[10,]
     if(x$stop_time_s != 2 * x$dist_m / x$speed_mps) {
-        cat_color("Nekde ve vypoctu je chyba.", FALSE) 
-    } else cat_color("Pravdepodobne vse v poradku")
+        cat_color("Někde ve výpočtu je chyba.", FALSE) 
+    } else cat_color("Pravděpodobně vše v pořádku")
 }
 
 check_answers_5 <- function() {
@@ -72,23 +72,23 @@ check_answers_5 <- function() {
   correct_q3 <- tolower(correct_q3)
 
   # Output
-  cat("**Vyhodnoceni:**\n\n")
+  cat("Vyhodnocení:\n\n")
 
-  cat("1. Model s nejvyssi hmotnosti: ",
+  cat("1. Model s nejvyšší hmotností: ",
       if (user_q1 %in% correct_q1) paste0(green, "OK", reset, "\n")
       else paste0(red, "chyba", reset, "\n"))
 
-  cat("2. Nejvyssi spotreba na tunu: ",
+  cat("2. Nejvyšší spotřeba na tunu: ",
       if (user_q2 %in% correct_q2) paste0(green, "OK", reset, "\n")
       else paste0(red, "chyba", reset, "\n"))
 
-  cat("3. Nejvyssi vykon: ",
+  cat("3. Nejvyšší výkon: ",
       if (user_q3 %in% correct_q3) paste0(green, "OK", reset, "\n")
       else paste0(red, "chyba", reset, "\n"))
 
-  cat("4. Ma nejlehci model nejnizsi spotrebu? ",
-      if (user_q4 == correct_q4) paste0(green, "Odpoved je spravna.", reset, "\n")
-      else paste0(red, "Odpoved je chybna.", reset, "\n"))
+  cat("4. Má nejlehčí model nejnižší spotřebu? ",
+      if (user_q4 == correct_q4) paste0(green, "Odpověď je správná.", reset, "\n")
+      else paste0(red, "Odpověď je chybná.", reset, "\n"))
 }
 
 check_answers_6 <- function() {
@@ -112,19 +112,19 @@ check_answers_6 <- function() {
   user_q3 <- tolower(trimws(q3_yes_no))
 
   # Output
-  cat("**Vyhodnoceni:**\n\n")
+  cat("Vyhodnocení:\n\n")
 
-  cat("1. Pocet skupin: ",
+  cat("1. Počet skupin: ",
       if (user_q1 == correct_q1) paste0(green, "OK", reset, "\n")
       else paste0(red, "chyba", reset, " (", user_q1, ")\n"))
 
-  cat("2. Pocet modelu v nejpocetnejsi skupine: ",
+  cat("2. Počet modelů v nejpočetnější skupině: ",
       if (user_q2 == correct_q2) paste0(green, "OK", reset, "\n")
       else paste0(red, "chyba", reset, " (", user_q2, ")\n"))
 
-  cat("3. Mely automaty vzdy nizsi spotrebu pri stejnem poctu valcu? ",
-      if (user_q3 == correct_q3) paste0(green, "Odpoved je spravna.", reset, "\n")
-      else paste0(red, "Odpoved je chybna.", reset, "\n"))
+  cat("3. Měly automaty vždy nižší spotřebu při stejném počtu válců? ",
+      if (user_q3 == correct_q3) paste0(green, "Odpověď je správná.", reset, "\n")
+      else paste0(red, "Odpověď je chybná.", reset, "\n"))
 }
 
       
