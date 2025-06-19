@@ -1,17 +1,19 @@
 # Load required library
-library(dplyr)
+library(tidyverse)
+library(readxl)
+
 # ANSI color codes
 green <- "\033[32m"
 red <- "\033[31m"
 reset <- "\033[0m"
 
 cat_color <- function(txt, TF = TRUE) {
-  if(TF) cat(paste0(green, txt)) else cat(paste0(red, txt))
+  if(TF) cat(paste0(green, "✅ ", txt, "\n")) else cat(paste0(red, "❌ ", txt, "\n"))
 }
 
 check_answers_1 <- function() {
     if (!is.null(colnames(df)) && sum(colnames(df) %in% c("mpg", "cyl", "disp")) == 3) {
-      cat_color("Data byla správně načtena.\n")
+      cat_color("Data byla správně načtena.")
     } else {
       cat_color("Data nejsou ve správném formátu. Zkontrolujte proměnnou 'data'.", FALSE)
     }
@@ -22,7 +24,7 @@ check_answers_2 <- function() {
     if(!TF) return(cat_color("Hodnoty nebyly přiřazeny do správných proměnných.", FALSE))
     TF <- n_rows == nrow(df) && round(max_hp,0) == round(max(df$hp),0) && round(med_cyl,0) == round(median(df$cyl))
     if (TF) {
-        return(cat_color("Vše přiřazeno správně.\n")) 
+        return(cat_color("Vše přiřazeno správně.")) 
     } else return(cat_color("Někde se stala chyba.", FALSE))
 }
 
@@ -126,5 +128,122 @@ check_answers_6 <- function() {
       if (user_q3 == correct_q3) paste0(green, "Odpověď je správná.", reset, "\n")
       else paste0(red, "Odpověď je chybná.", reset, "\n"))
 }
+### 02
 
-      
+check_answers_02_01 <- function() {
+  an <- read_excel("data/SKO21.xlsx", range = "B3:S5", col_names = FALSE) %>% 
+  suppressMessages() %>% 
+  t() %>% 
+  as.data.frame() 
+
+  if(!identical(an, analysis_excel)) {
+     cat_color("Někde je chyba.", FALSE) 
+  } else cat_color("Pravděpodobně vše v pořádku")
+}
+
+check_answers_02_02 <- function() {
+  if(is.null(analysis_filter)) return(cat_color("Není vytvořena proměnná 'analysis_filter'.", FALSE))
+
+  if(any(is.na(analysis_filter$V1))) {
+     cat_color("Někde je chyba.", FALSE) 
+  } else cat_color("Pravděpodobně vše v pořádku")
+}
+
+check_answers_02_03 <- function() {
+
+  if (!exists("analysis_transform")) {
+    return(cat_color("Není vytvořena proměnná 'analysis_transform'.", FALSE))
+  }
+
+  correct_types <- c("character", "Date", "numeric")
+  current_types <- vapply(analysis_transform, function(x) class(x)[1], character(1))
+  
+  if (length(current_types) != 3 ||
+      !all(current_types == correct_types)) {
+    return(cat_color("Sloupce nemají požadované datové typy (char, Date, dbl).", FALSE))
+  }
+
+  if (anyNA(analysis_transform)) {
+    return(cat_color("Tabulka obsahuje hodnoty NA – je třeba ji vyčistit.", FALSE))
+  }
+  
+  cat_color("Pravděpodobně vše v pořádku.")
+}
+
+check_answers_02_04 <- function() {
+  if (!exists("analysis")) {
+    return(cat_color("Tabulka 'analysis' neexistuje.", FALSE))
+  }
+
+  valid_dimensions <- nrow(analysis) == 9 && ncol(analysis) == 5
+  has_na_except_second <- all(!is.na(analysis[ , -2]))  # mimo 2. sloupec
+  first_col_char <- is.character(analysis[[1]]) || is.factor(analysis[[1]])
+
+  if (!valid_dimensions) {
+    cat_color("Tabulka 'analysis' nemá správné rozměry (9 řádků, 5 sloupců).", FALSE)
+  } else if (!first_col_char) {
+    cat_color("První sloupec tabulky 'analysis' by měl obsahovat názvy obcí (text).", FALSE)
+  } else if (!has_na_except_second) {
+    cat_color("Tabulka 'analysis' obsahuje NA mimo druhý sloupec.", FALSE)
+  } else {
+    cat_color("Tabulka 'analysis' vypadá v pořádku.")
+  }
+
+  counts <- analysis %>% count(residential_type)                    
+  
+  if (nrow(counts) != 3) {
+    return(cat_color("Tabulka součtů by měla mít 3 řádky.", FALSE))
+  }
+  
+  n_bt <- counts$n[grepl("byt", counts$residential_type, ignore.case = TRUE)]
+  n_rd <- counts$n[grepl("rodinn", counts$residential_type, ignore.case = TRUE)]
+  n_na <- counts$n[is.na(counts$residential_type)]
+  
+  if (length(n_bt) != 1 || n_bt != 2) {
+    return(cat_color("Bytových zástaveb musí být 2.", FALSE))
+  }
+  if (length(n_rd) != 1 || n_rd != 2) {
+    return(cat_color("Zástaveb rodinných domů musí být 2.", FALSE))
+  }
+  if (length(n_na) != 1 || n_na != 5) {
+    return(cat_color("Počet chybějících hodnot (NA) musí být 5.", FALSE))
+  }
+  
+  cat_color("Tabulka součtů vypadá také v pořádku.")
+}
+
+check_answers_02_05 <- function() {
+  if (!exists("df_select")) {
+    return(cat_color("Objekt 'df_select' neexistuje.", FALSE))
+  }
+  
+  expected_names <- c("waste", paste0("an_", 1:9))
+  
+  if (!all(names(df_select) == expected_names)) {
+    return(cat_color("Sloupce df_select neodpovídají požadovaným názvům.", FALSE))
+  }
+  
+  if (nrow(df_select) != 27) {
+    return(cat_color("Data.frame nemá správný počet řádků.", FALSE))
+  }
+  
+  cat_color("Tabulka 'df_select' má správný počet řádků i názvy sloupců.")
+}
+
+check_answers_02_06 <- function() {
+  if (!exists("df_filter")) {
+    return(cat_color("Objekt 'df_filter' neexistuje.", FALSE))
+  }
+  
+  if (!"waste" %in% names(df_filter)) {
+    return(cat_color("Sloupec 'waste' v df_filter chybí.", FALSE))
+  }
+  
+  if (any(grepl("celkem", df_filter$waste, ignore.case = TRUE))) {
+    return(cat_color("Sloupec 'waste' obsahuje řádky se slovem 'celkem'", FALSE))
+  }
+  
+  cat_color("Sloupec 'waste' neobsahuje žádné řádky se slovem 'celkem'")
+}
+                          
+
